@@ -58,7 +58,7 @@
         .section-box { background: var(--branco); padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .section-box h3 { margin-bottom: 15px; color: var(--cinza-escuro); font-size: 18px; }
         
-        /* Tabelas */
+        /* Tabelas e Listas */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; background: var(--branco); }
         th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
         th { background-color: var(--cinza-claro); font-weight: 600; }
@@ -108,6 +108,7 @@
 
         <!-- CONTEÚDO DAS PÁGINAS -->
         <main>
+            <!-- 1. DASHBOARD (ADMIN) -->
             <div id="page-dashboard" class="page">
                 <h2>Dashboard</h2>
                 <div class="dash-grid">
@@ -128,17 +129,20 @@
                         <div class="value" id="dash-total-saidas" style="color: #c62828;">R$ 0,00</div>
                     </div>
                 </div>
+
                 <div class="section-box">
-                    <h3>🎉 Membros do Terreiro</h3>
+                    <h3>🎉 Aniversariantes do Mês</h3>
                     <div id="lista-aniversariantes"></div>
                 </div>
             </div>
 
+            <!-- 2. CADASTRO ÚNICO -->
             <div id="page-cadastro" class="page">
                 <h2>Meu Cadastro / Atualizações</h2>
                 <div class="section-box" id="form-cadastro"></div>
             </div>
 
+            <!-- 3. MENSALIDADES E DOAÇÕES -->
             <div id="page-financeiro" class="page">
                 <h2>Financeiro</h2>
                 <div class="section-box">
@@ -151,6 +155,7 @@
                 </div>
             </div>
 
+            <!-- 4. OBRIGAÇÕES -->
             <div id="page-obrigacoes" class="page">
                 <h2>Obrigações Espirituais</h2>
                 <div class="section-box">
@@ -163,11 +168,13 @@
                 </div>
             </div>
 
+            <!-- 5. CALENDÁRIO DE GIRAS -->
             <div id="page-giras" class="page">
                 <h2>Calendário de Giras e Comunicados</h2>
                 <div class="section-box" id="lista-giras"></div>
             </div>
 
+            <!-- 6. RIFAS -->
             <div id="page-rifas" class="page">
                 <h2>Ações entre Amigos (Rifas)</h2>
                 <div class="section-box" id="lista-rifas"></div>
@@ -175,11 +182,11 @@
         </main>
     </div>
 
-    <!-- CONEXÃO DIRETA COM O SUPABASE -->
+    <!-- BIBLIOTECA DO SUPABASE REAL -->
     <script src="https://jsdelivr.net"></script>
     <script>
         const SUPABASE_URL = "https://supabase.co";
-        const SUPABASE_KEY = "sb_publishable_Q0mq6mAdP502_Bk3GNkj0A_TrWpLeKx";
+        const SUPABASE_KEY = "sb_publishable_QOmq6mAdP5O2_Bk3GNKj0A_TrWplMWh1NDc4YjMtM2FkOC00OGIzLTk5NGYtM2FkOGExZTVhMmVk";
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let usuarioLogado = null;
@@ -190,12 +197,3 @@
 
             const { data: usuarios, error } = await supabaseClient
                 .from('usuarios')
-                .select('*')
-                .eq('email', email)
-                .eq('senha', senha);
-
-            if (error) {
-                alert("Erro ao conectar com o banco de dados.");
-                return;
-            }
-
