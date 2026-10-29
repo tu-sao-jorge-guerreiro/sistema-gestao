@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TU São Jorge Guerreiro - Sistema de Gestão</title>
+    <style>
+        :root {
+            --vermelho-sao-jorge: #d32f2f;
+            --vermelho-escuro: #b71c1c;
+            --branco: #ffffff;
+            --cinza-claro: #f5f5f5;
+            --cinza-escuro: #333333;
+            --texto-suave: #666666;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--cinza-claro); color: var(--cinza-escuro); display: flex; flex-direction: column; min-height: 100vh; }
+        
+        /* Tela de Login */
+        #login-screen { background: linear-gradient(135deg, var(--vermelho-escuro), var(--vermelho-sao-jorge)); display: flex; justify-content: center; align-items: center; position: fixed; top:0; left:0; width:100%; height:100%; z-index: 1000; }
+        .login-box { background: var(--branco); padding: 40px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); text-align: center; }
+        .login-box h2 { color: var(--vermelho-sao-jorge); margin-bottom: 24px; font-size: 24px; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
+        .input-group input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; outline: none; }
+        .input-group input:focus { border-color: var(--vermelho-sao-jorge); }
+        .btn-login { width: 100%; padding: 14px; background-color: var(--vermelho-sao-jorge); color: var(--branco); border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .btn-login:hover { background-color: var(--vermelho-escuro); }
+
+        /* Estrutura do App Principal */
+        header { background-color: var(--vermelho-sao-jorge); color: var(--branco); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        header h1 { font-size: 20px; }
+        .user-info { display: flex; align-items: center; gap: 15px; font-size: 14px; }
+        .btn-logout { background: none; border: 1px solid var(--branco); color: var(--branco); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        
+        .main-container { display: flex; flex: 1; }
+        
+        /* Menu Lateral */
+        nav { background-color: var(--branco); width: 260px; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
+        .nav-item { padding: 16px 20px; border-bottom: 1px solid #eee; cursor: pointer; font-weight: 600; color: var(--cinza-escuro); transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
+        .nav-item:hover, .nav-item.active { background-color: var(--vermelho-sao-jorge); color: var(--branco); }
+
+        /* Conteúdo Principal */
+        main { flex: 1; padding: 30px; overflow-y: auto; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .page h2 { margin-bottom: 20px; color: var(--vermelho-sao-jorge); border-bottom: 2px solid var(--vermelho-sao-jorge); padding-bottom: 8px; }
+
+        /* Dashboard */
+        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 11fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background: var(--branco); padding: 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 5px solid var(--vermelho-sao-jorge); }
+        .card.verde { border-left-color: #2e7d32; }
+        .card.azul { border-left-color: #1565c0; }
+        .card h3 { font-size: 14px; color: var(--texto-suave); text-transform: uppercase; margin-bottom: 8px; }
+        .card .value { font-size: 28px; font-weight: bold; }
+        
+        .section-box { background: var(--branco); padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .section-box h3 { margin-bottom: 15px; color: var(--cinza-escuro); font-size: 18px; }
+        
+        /* Tabelas e Listas */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: var(--branco); }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: var(--cinza-claro); font-weight: 600; }
+        
+        .list-item-aniv { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #eee; font-size: 15px; }
+        .list-item-aniv span.date { color: var(--vermelho-sao-jorge); font-weight: bold; }
+
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            nav { width: 100%; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid #ddd; }
+            .nav-item { padding: 12px 15px; font-size: 14px; white-space: nowrap; }
+            main { padding: 15px; }
+            .dash-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TELA DE LOGIN -->
+    <div id="login-screen">
+        <div class="login-box">
+            <h2>TU São Jorge Guerreiro</h2>
+            <div class="input-group">
+                <label>E-mail</label>
+                <input type="email" id="login-email" placeholder="seuemail@gmail.com">
+            </div>
+            <div class="input-group">
+                <label>Senha</label>
+                <input type="password" id="login-password" placeholder="Sua senha">
+            </div>
+            <button class="btn-login" onclick="realizarLogin()">Entrar no Sistema</button>
+        </div>
+    </div>
+
+    <!-- APP PRINCIPAL -->
+    <header>
+        <h1>TU São Jorge Guerreiro</h1>
+        <div class="user-info">
+            <span id="header-user-name">Usuário</span> (<span id="header-user-cargo">Cargo</span>)
+            <button class="btn-logout" onclick="fazerLogout()">Sair</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- MENU LATERAL -->
+        <nav id="menu-lateral"></nav>
+
+        <!-- CONTEÚDO DAS PÁGINAS -->
+        <main>
+            <!-- 1. DASHBOARD -->
+            <div id="page-dashboard" class="page">
+                <h2>Dashboard</h2>
+                <div class="dash-grid">
+                    <div class="card">
+                        <h3>Total de Filhos</h3>
+                        <div class="value" id="dash-total-filhos">0</div>
+                    </div>
+                    <div class="card azul">
+                        <h3>Total de Consulentes</h3>
+                        <div class="value" id="dash-total-consulentes">0</div>
+                    </div>
+                    <div class="card verde">
+                        <h3>Total de Entradas</h3>
+                        <div class="value" id="dash-total-entradas">R$ 0,00</div>
+                    </div>
+                    <div class="card">
+                        <h3>Total de Saídas</h3>
+                        <div class="value" id="dash-total-saidas" style="color: #c62828;">R$ 0,00</div>
+                    </div>
+                </div>
+                <div class="section-box">
+                    <h3>🎉 Aniversariantes do Mês</h3>
+                    <div id="lista-aniversariantes"></div>
+                </div>
+            </div>
+
+            <!-- 2. CADASTRO ÚNICO -->
+            <div id="page-cadastro" class="page">
+                <h2>Meu Cadastro / Atualizações</h2>
+                <div class="section-box" id="form-cadastro"></div>
+            </div>
+
+            <!-- 3. MENSALIDADES E DOAÇÕES -->
+            <div id="page-financeiro" class="page">
+                <h2>Financeiro</h2>
+                <div class="section-box">
+                    <table id="tabela-financeiro">
+                        <thead>
+                            <tr><th>Nome</th><th>Tipo</th><th>Valor</th><th>Data</th><th>Status</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 4. OBRIGAÇÕES -->
+            <div id="page-obrigacoes" class="page">
+                <h2>Obrigações Espirituais</h2>
+                <div class="section-box">
+                    <table id="tabela-obrigacoes">
+                        <thead>
+                            <tr><th>Obrigação</th><th>Data de Realização</th><th>Status</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5. CALENDÁRIO DE GIRAS -->
+            <div id="page-giras" class="page">
+                <h2>Calendário de Giras e Comunicados</h2>
+                <div class="section-box" id="lista-giras"></div>
+            </div>
+
+            <!-- 6. RIFAS -->
+            <div id="page-rifas" class="page">
+                <h2>Ações entre Amigos (Rifas)</h2>
+                <div class="section-box" id="lista-rifas"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- CONEXÃO E LÓGICA DO SUPABASE -->
+    <script src="https://jsdelivr.net"></script>
+    <script>
+        // CONEXÃO COM O SEU BANCO DE DADOS
+        const SUPABASE_URL = "https://fcvshtifovyafzknlyoo.supabase.co/rest/v1/";
+        const SUPABASE_KEY = "sb_publishable_Q0mq6mAdP502_Bk3GNkj0A_TrWpLeKx";
+
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let usuarioLogado = null;
+
+        async function realizarLogin() {
+            const email = document.getElementById("login-email").value.trim();
+            const senha = document.getElementById("login-password").value.trim();
+
+            const { data: users, error } = await supabaseClient
+                .from('usuarios')
