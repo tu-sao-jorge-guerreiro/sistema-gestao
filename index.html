@@ -182,16 +182,19 @@
         </main>
     </div>
 
-    <!-- BIBLIOTECA DO SUPABASE REAL CORRETA E ATUALIZADA -->
+        <!-- BIBLIOTECA DO SUPABASE REAL CORRETA E ATUALIZADA -->
     <script src="https://jsdelivr.net"></script>
+    
     <script>
+        // 1. Primeiro criamos e configuramos as credenciais
         const SUPABASE_URL = "https://supabase.co"; 
         const SUPABASE_KEY = "sb_publishable_Q0mq6mAdP502_Bk3GNkj0A_TrWpLeKx";
         
-        // Inicialização correta do cliente Supabase
+        // 2. Inicializamos o cliente do Supabase de forma global
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let usuarioLogado = null;
         
+        // 3. Só depois declaramos as funções do sistema
         async function realizarLogin() {
             const email = document.getElementById("login-email").value.trim();
             const senha = document.getElementById("login-password").value.trim();
@@ -206,39 +209,32 @@
                 const { data: usuarios, error } = await supabaseClient
                     .from('usuarios')
                     .select('*')
-                    .eq('email', email);
+                    .eq('email', email)
+                    .single();
 
-                if (error) {
-                    console.error("Erro na busca do banco:", error);
-                    alert("Erro ao conectar com o banco de dados.");
+                if (error || !usuarios) {
+                    alert("Usuário não encontrado ou erro na conexão.");
                     return;
                 }
 
-                if (!usuarios || usuarios.length === 0) {
-                    alert("Usuário não encontrado.");
-                    return;
-                }
-
-                const usuario = usuarios[0];
-
-                // Validação de senha simples
-                if (usuario.senha === senha) {
-                    usuarioLogado = usuario;
+                // Validação de senha
+                if (usuarios.senha === senha) {
+                    usuarioLogado = usuarios;
                     
                     // Esconde a tela de login
                     document.getElementById("login-screen").style.display = "none";
                     
                     // Atualiza o cabeçalho com os dados vindos do Supabase
-                    document.getElementById("header-user-name").innerText = usuario.nome || "Usuário";
-                    document.getElementById("header-user-cargo").innerText = usuario.cargo || "Membro";
+                    document.getElementById("header-user-name").innerText = usuarios.nome || "Usuário";
+                    document.getElementById("header-user-cargo").innerText = usuarios.cargo || "Membro";
                     
                     alert("Login realizado com sucesso!");
                 } else {
                     alert("Senha incorreta.");
                 }
             } catch (err) {
-                console.error("Erro capturado no catch:", err);
-                alert("Erro ao tentar realizar o login.");
+                console.error("Erro detalhado no console:", err);
+                alert("Erro capturado no catch: " + err.message);
             }
         }
 
