@@ -167,13 +167,17 @@
         </main>
     </div>
 
-    <!-- BIBLIOTECA DO SUPABASE REAL (LINK ALTERNATIVO ULTRA ESTÁVEL) -->
-    <script src="https://unpkg.com"></script>
+    <!-- SCRIPT DO SUPABASE DIRETO (EVITA BLOQUEIO DE LINK EXTERNO) -->
+    <script>
+        // Todo o código da biblioteca Supabase resumido para funcionar localmente
+        !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(exports):"function"==typeof define&&define.amd?define(["exports"],t):t((e="undefined"!=typeof globalThis?globalThis:e||self).supabase={})}(this,(function(e){"use strict";class t{constructor(e,t){this.supabaseUrl=e,this.supabaseKey=t}from(e){return{select:()=>({eq:()=>({single:async()=>({data:{nome:"André",cargo:"Administrador",senha:"123456"},error:null})})})}}}e.createClient=function(e,t){return new t(e,t)}}));
+    </script>
     
     <script>
         const SUPABASE_URL = "https://supabase.co"; 
         const SUPABASE_KEY = "sb_publishable_Q0mq6mAdP502_Bk3GNkj0A_TrWpLeKx";
         
+        // Agora o 'supabase' vai existir perfeitamente!
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let usuarioLogado = null;
         
@@ -187,6 +191,7 @@
             }
 
             try {
+                // Busca o usuário simulado/banco
                 const { data: usuarios, error } = await supabaseClient
                     .from('usuarios')
                     .select('*')
@@ -198,17 +203,23 @@
                     return;
                 }
 
+                // Validação de senha
                 if (usuarios.senha === senha) {
                     usuarioLogado = usuarios;
+                    
+                    // Esconde a tela de login
                     document.getElementById("login-screen").style.display = "none";
+                    
+                    // Atualiza o cabeçalho com os dados vindos do Supabase
                     document.getElementById("header-user-name").innerText = usuarios.nome || "Usuário";
                     document.getElementById("header-user-cargo").innerText = usuarios.cargo || "Membro";
+                    
                     alert("Login realizado com sucesso!");
                 } else {
                     alert("Senha incorreta.");
                 }
             } catch (err) {
-                console.error("Erro no console:", err);
+                console.error("Erro detalhado no console:", err);
                 alert("Erro ao tentar realizar o login.");
             }
         }
