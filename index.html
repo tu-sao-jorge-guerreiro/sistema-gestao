@@ -167,18 +167,15 @@
         </main>
     </div>
 
-    <!-- SCRIPT DO SUPABASE DIRETO (EVITA BLOQUEIO DE LINK EXTERNO) -->
-    <script>
-        // Todo o código da biblioteca Supabase resumido para funcionar localmente
-        !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(exports):"function"==typeof define&&define.amd?define(["exports"],t):t((e="undefined"!=typeof globalThis?globalThis:e||self).supabase={})}(this,(function(e){"use strict";class t{constructor(e,t){this.supabaseUrl=e,this.supabaseKey=t}from(e){return{select:()=>({eq:()=>({single:async()=>({data:{nome:"André",cargo:"Administrador",senha:"123456"},error:null})})})}}}e.createClient=function(e,t){return new t(e,t)}}));
-    </script>
+    <!-- SCRIPT OFICIAL DO SUPABASE COM COMPATIBILIDADE CORRETA -->
+    <script src="https://jsdelivr.net"></script>
     
     <script>
         const SUPABASE_URL = "https://supabase.co"; 
         const SUPABASE_KEY = "sb_publishable_Q0mq6mAdP502_Bk3GNkj0A_TrWpLeKx";
         
-        // Agora o 'supabase' vai existir perfeitamente!
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Inicialização usando a janela global de forma segura
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let usuarioLogado = null;
         
         async function realizarLogin() {
@@ -191,28 +188,36 @@
             }
 
             try {
-                // Busca o usuário simulado/banco
+                // Busca o usuário no banco de dados do Supabase
                 const { data: usuarios, error } = await supabaseClient
                     .from('usuarios')
                     .select('*')
-                    .eq('email', email)
-                    .single();
+                    .eq('email', email);
 
-                if (error || !usuarios) {
-                    alert("Usuário não encontrado ou erro na conexão.");
+                if (error) {
+                    console.error("Erro na busca:", error);
+                    alert("Erro ao conectar com a tabela de usuários.");
                     return;
                 }
 
+                if (!usuarios || usuarios.length === 0) {
+                    alert("Usuário não encontrado.");
+                    return;
+                }
+
+                // Como vem uma lista, pegamos o primeiro resultado encontrado
+                const usuario = usuarios[0];
+
                 // Validação de senha
-                if (usuarios.senha === senha) {
-                    usuarioLogado = usuarios;
+                if (usuario.senha === senha) {
+                    usuarioLogado = usuario;
                     
                     // Esconde a tela de login
                     document.getElementById("login-screen").style.display = "none";
                     
                     // Atualiza o cabeçalho com os dados vindos do Supabase
-                    document.getElementById("header-user-name").innerText = usuarios.nome || "Usuário";
-                    document.getElementById("header-user-cargo").innerText = usuarios.cargo || "Membro";
+                    document.getElementById("header-user-name").innerText = usuario.nome || "Usuário";
+                    document.getElementById("header-user-cargo").innerText = usuario.cargo || "Membro";
                     
                     alert("Login realizado com sucesso!");
                 } else {
