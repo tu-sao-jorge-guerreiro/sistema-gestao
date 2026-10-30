@@ -104,12 +104,17 @@
 
     <div class="main-container">
         <!-- MENU LATERAL -->
-        <nav id="menu-lateral"></nav>
+        <nav id="menu-lateral">
+            <div class="nav-item active" onclick="navegarPara('page-dashboard')">📊 Dashboard</div>
+            <div class="nav-item" onclick="navegarPara('page-cadastro')">📝 Cadastro / Atualizações</div>
+            <div class="nav-item" onclick="navegarPara('page-financeiro')">💰 Financeiro</div>
+            <div class="nav-item" onclick="navegarPara('page-rifas')">🎟️ Rifas</div>
+        </nav>
 
         <!-- CONTEÚDO DAS PÁGINAS -->
         <main>
-            <!-- 1. DASHBOARD (ADMIN) -->
-            <div id="page-dashboard" class="page">
+            <!-- 1. DASHBOARD -->
+            <div id="page-dashboard" class="page active">
                 <h2>Dashboard</h2>
                 <div class="dash-grid">
                     <div class="card">
@@ -129,17 +134,16 @@
                         <div class="value" id="dash-total-saidas" style="color: #c62828;">R$ 0,00</div>
                     </div>
                 </div>
-
                 <div class="section-box">
                     <h3>🎉 Aniversariantes do Mês</h3>
-                    <div id="lista-aniversariantes"></div>
+                    <div id="lista-aniversariantes">Nenhum registrado.</div>
                 </div>
             </div>
 
             <!-- 2. CADASTRO ÚNICO -->
             <div id="page-cadastro" class="page">
                 <h2>Meu Cadastro / Atualizações</h2>
-                <div class="section-box" id="form-cadastro"></div>
+                <div class="section-box" id="form-cadastro">Conteúdo de cadastro disponível após o login.</div>
             </div>
 
             <!-- 3. MENSALIDADES E DOAÇÕES -->
@@ -155,46 +159,23 @@
                 </div>
             </div>
 
-            <!-- 4. OBRIGAÇÕES -->
-            <div id="page-obrigacoes" class="page">
-                <h2>Obrigações Espirituais</h2>
-                <div class="section-box">
-                    <table id="tabela-obrigacoes">
-                        <thead>
-                            <tr><th>Obrigação</th><th>Data de Realização</th><th>Status</th></tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- 5. CALENDÁRIO DE GIRAS -->
-            <div id="page-giras" class="page">
-                <h2>Calendário de Giras e Comunicados</h2>
-                <div class="section-box" id="lista-giras"></div>
-            </div>
-
-            <!-- 6. RIFAS -->
+            <!-- 4. RIFAS -->
             <div id="page-rifas" class="page">
                 <h2>Ações entre Amigos (Rifas)</h2>
-                <div class="section-box" id="lista-rifas"></div>
+                <div class="section-box" id="lista-rifas">Nenhuma ação ativa.</div>
             </div>
         </main>
     </div>
 
-        <!-- BIBLIOTECA DO SUPABASE REAL CORRETA E ATUALIZADA -->
+    <!-- CARREGAMENTO DO SUPABASE -->
     <script src="https://jsdelivr.net"></script>
-    
     <script>
-        // 1. Primeiro criamos e configuramos as credenciais
         const SUPABASE_URL = "https://supabase.co"; 
         const SUPABASE_KEY = "sb_publishable_Q0mq6mAdP502_Bk3GNkj0A_TrWpLeKx";
         
-        // 2. Inicializamos o cliente do Supabase de forma global
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let usuarioLogado = null;
         
-        // 3. Só depois declaramos as funções do sistema
         async function realizarLogin() {
             const email = document.getElementById("login-email").value.trim();
             const senha = document.getElementById("login-password").value.trim();
@@ -205,45 +186,9 @@
             }
 
             try {
-                // Busca o usuário no banco de dados do Supabase
                 const { data: usuarios, error } = await supabaseClient
                     .from('usuarios')
                     .select('*')
-                    .eq('email', email)
-                    .single();
+                    .eq('email', email);
 
-                if (error || !usuarios) {
-                    alert("Usuário não encontrado ou erro na conexão.");
-                    return;
-                }
-
-                // Validação de senha
-                if (usuarios.senha === senha) {
-                    usuarioLogado = usuarios;
-                    
-                    // Esconde a tela de login
-                    document.getElementById("login-screen").style.display = "none";
-                    
-                    // Atualiza o cabeçalho com os dados vindos do Supabase
-                    document.getElementById("header-user-name").innerText = usuarios.nome || "Usuário";
-                    document.getElementById("header-user-cargo").innerText = usuarios.cargo || "Membro";
-                    
-                    alert("Login realizado com sucesso!");
-                } else {
-                    alert("Senha incorreta.");
-                }
-            } catch (err) {
-                console.error("Erro detalhado no console:", err);
-                alert("Erro capturado no catch: " + err.message);
-            }
-        }
-
-        function fazerLogout() {
-            usuarioLogado = null;
-            document.getElementById("login-email").value = "";
-            document.getElementById("login-password").value = "";
-            document.getElementById("login-screen").style.display = "flex";
-        }
-    </script>
-</body>
-</html>
+                if (error) {
