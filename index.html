@@ -182,18 +182,65 @@
         </main>
     </div>
 
-    <!-- BIBLIOTECA DO SUPABASE REAL -->
+    <!-- BIBLIOTECA DO SUPABASE REAL (CORRIGIDA) -->
     <script src="https://jsdelivr.net"></script>
     <script>
-        const SUPABASE_URL = "https://fcvshtifovyafzknlyoo.supabase.co/rest/v1/";
+        const SUPABASE_URL = "https://supabase.co"; 
         const SUPABASE_KEY = "sb_publishable_Q0mq6mAdP502_Bk3GNkj0A_TrWpLeKx";
         
+        // Inicialização correta do cliente Supabase
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let usuarioLogado = null;
-
+        
         async function realizarLogin() {
             const email = document.getElementById("login-email").value.trim();
             const senha = document.getElementById("login-password").value.trim();
 
-            const { data: usuarios, error } = await supabaseClient
-                .from('usuarios')
+            if (!email || !senha) {
+                alert("Por favor, preencha todos os campos.");
+                return;
+            }
+
+            try {
+                // Busca o usuário no banco de dados do Supabase
+                const { data: usuarios, error } = await supabaseClient
+                    .from('usuarios')
+                    .select('*')
+                    .eq('email', email)
+                    .single();
+
+                if (error || !usuarios) {
+                    alert("Usuário não encontrado ou erro na conexão.");
+                    return;
+                }
+
+                // Validação de senha
+                if (usuarios.senha === senha) {
+                    usuarioLogado = usuarios;
+                    
+                    // Esconde a tela de login
+                    document.getElementById("login-screen").style.display = "none";
+                    
+                    // Atualiza o cabeçalho com os dados vindos do Supabase
+                    document.getElementById("header-user-name").innerText = usuarios.nome || "Usuário";
+                    document.getElementById("header-user-cargo").innerText = usuarios.cargo || "Membro";
+                    
+                    alert("Login realizado com sucesso!");
+                } else {
+                    alert("Senha incorreta.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao tentar realizar o login.");
+            }
+        }
+
+        function fazerLogout() {
+            usuarioLogado = null;
+            document.getElementById("login-email").value = "";
+            document.getElementById("login-password").value = "";
+            document.getElementById("login-screen").style.display = "flex";
+        }
+    </script>
+</body>
+</html>
